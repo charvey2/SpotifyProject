@@ -1,7 +1,36 @@
 import { useState, useEffect } from 'react';
 import { accessToken, logout, getCurrentUserProfile } from './spotify';
 import { catchErrors } from './utils';
-import './App.css';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from 'react-router-dom';
+import styled from 'styled-components/macro';
+
+import { GlobalStyle } from './styles';
+
+
+
+const StyledLoginButton = styled.a`
+  background-color: var(--green);
+  color: var(--white);
+  padding: 10px 20px;
+  margin: 20px auto;
+  border-radius: 30px;
+  display: inline-block;
+  `;
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 function App() {
   const [token, setToken] = useState(null);
@@ -21,30 +50,53 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <GlobalStyle />
+        <header className="App-header">
         {!token ? (
-        <a
+        <StyledLoginButton
           className="App-link"
           href="http://localhost:8888/login"
         >
           Log in to Spotify
-        </a>
+        </StyledLoginButton>
         ) : (
-          <>
-          <h1>Logged in!</h1>
-          <button onClick={logout}>Log Out</button>
+            <Router>
+              <ScrollToTop />
+                <Routes>
+                  <Route path='/top-artists'
+                  element= {<h1>Top Artists</h1> }/>
+                    
+                  <Route path='/top-tracks'
+                  element = {<h1>Top Tracks</h1>}/>
+                    
+                  <Route path='/playlists/:id'
+                  element = {<h1>Playlist</h1>}/>
+                    
+                  <Route path='/playlists' 
+                  element = {<h1>Playlists</h1>}/>
 
-          {profile && (
-            <div>
-            <h1>{profile.display_name}</h1>
-            <p>{profile.followers.total} Followers</p>
-            {profile.images.length && profile.images[0].url && (
-              <img src={profile.images[0].url} alt="Avatar" />
-            )}
-            </div>
+                  <Route path="/" 
+                  element = {
+                    <>
+                    <button onClick={logout}>Log Out</button>
+
+                    {profile && (
+                      <div>
+                        <h1>{profile.display_name}</h1>
+                        <p>{profile.followers.total} Followers</p>
+                        {profile.images.length && profile.images[0].url && (
+                          <img src={profile.images[0].url} alt="Avatar"/>
+                        )}
+                      </div>
+                    )}
+                  </>
+                  }>
+
+                </Route>
+                    
+              </Routes>
+            </Router>
           )}
-          </>
-        )}
       </header>
     </div>
   );
